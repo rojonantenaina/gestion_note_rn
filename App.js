@@ -14,6 +14,7 @@ import {
   HStack,
   Avatar,
   Spacer,
+  StatusBar,
 } from "native-base";
 import axios from "axios";
 
@@ -51,7 +52,6 @@ export default function App() {
     formData.append("nom", nom);
     formData.append("moyenne", moyenne);
     if (type === "ajout") {
-      console.log(formData);
       axios
         .post("http://127.0.0.1:8000/api/etudiants", formData)
         .then((response) => {
@@ -64,9 +64,7 @@ export default function App() {
     } else if (type === "modif") {
       axios
         .put(`http://127.0.0.1:8000/api/etudiants/${id}`, {
-          numeroEtudiant,
-          nom,
-          moyenne,
+          formData,
         })
         .then((response) => {
           console.log(formData);
@@ -93,7 +91,6 @@ export default function App() {
   };
 
   const supprimerEtudiant = (id) => {
-    console.log(id);
     axios
       .delete(`http://127.0.0.1:8000/api/etudiants/${id}`)
       .then((response) => {
@@ -134,8 +131,22 @@ export default function App() {
 
   return (
     <NativeBaseProvider>
-      <Center>
-        <Heading>Gestion de note</Heading>
+      <StatusBar />
+      <Box flex={1}>
+        <Box
+          p="2"
+          width="full"
+          bg="primary.500"
+          _text={{
+            fontSize: "md",
+            fontWeight: "medium",
+            color: "warmGray.50",
+            letterSpacing: "lg",
+          }}
+          shadow={2}
+        >
+          GESTION DE NOTE
+        </Box>
         <Modal isOpen={modalVisible} onClose={setModalVisible}>
           <Modal.Content maxH="500">
             <Modal.CloseButton />
@@ -186,59 +197,29 @@ export default function App() {
             </Modal.Footer>
           </Modal.Content>
         </Modal>
-        <Center>
-          <VStack space={4}>
-            <Button onPress={() => handleSizeClick()}>Nouveau</Button>
-          </VStack>
-        </Center>
+        <Box p={2} style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button rounded={20} onPress={() => handleSizeClick()}>
+            Nouveau
+          </Button>
+        </Box>
         <FlatList
           data={etudiants}
           renderItem={({ item }) => (
-            <Box
-              borderBottomWidth="1"
-              _dark={{
-                borderColor: "muted.50",
-              }}
-              borderColor="muted.800"
-              pl={["0", "4"]}
-              pr={["0", "5"]}
-              py="2"
-            >
+            <Box borderBottomWidth="1" borderColor="muted.800" py="2" px={2}>
               <HStack space={[2, 3]} justifyContent="space-between">
                 <VStack>
-                  <Text
-                    _dark={{
-                      color: "warmGray.50",
-                    }}
-                    color="coolGray.800"
-                    bold
-                  >
-                    {item.numeroEtudiant}
+                  <Text color="coolGray.800" bold>
+                    IM : {item.numeroEtudiant}
                   </Text>
-                  <Text
-                    color="coolGray.600"
-                    _dark={{
-                      color: "warmGray.200",
-                    }}
-                  >
-                    {item.nom}
+                  <Text color="coolGray.600">Nom : {item.nom}</Text>
+                  <Text fontSize="xs" color="coolGray.800">
+                    Moyenne : {item.moyenne}
                   </Text>
                 </VStack>
                 <Spacer />
-                <Text
-                  fontSize="xs"
-                  _dark={{
-                    color: "warmGray.50",
-                  }}
-                  color="coolGray.800"
-                  alignSelf="flex-start"
-                >
-                  {item.moyenne}
-                </Text>
-                <Button onPress={() => supprimerEtudiant(item.id)}>
-                  Supprimer
-                </Button>
                 <Button
+                  colorScheme="success"
+                  size="sm"
                   onPress={() =>
                     modifierEtudiant(
                       item.id,
@@ -250,6 +231,13 @@ export default function App() {
                 >
                   Modifier
                 </Button>
+                <Button
+                  colorScheme="danger"
+                  size="sm"
+                  onPress={() => supprimerEtudiant(item.id)}
+                >
+                  Supprimer
+                </Button>
               </HStack>
             </Box>
           )}
@@ -260,7 +248,8 @@ export default function App() {
         <Text>Moyenne maximale : {moyenneMax}</Text>
         <Text>Nombre admis : {nombreAdmis}</Text>
         <Text>Nombre rédoublant : {nombreRedoublant}</Text>
-      </Center>
+      </Box>
     </NativeBaseProvider>
   );
 }
+
